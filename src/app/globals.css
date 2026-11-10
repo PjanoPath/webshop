@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-olive-800;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-olive-700 px-6 py-3 text-sm font-medium text-cream-50 transition hover:bg-olive-800 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-olive-300 bg-transparent px-6 py-3 text-sm font-medium text-olive-700 transition hover:bg-olive-50 active:scale-[0.98];
+  }
+
+  .card {
+    @apply rounded-xl2 bg-white shadow-card;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-olive-200 bg-white px-4 py-2.5 text-olive-900 placeholder:text-olive-300 focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-200;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-olive-700;
+  }
+
+  .tag-pill {
+    @apply rounded-full bg-cream-200 px-2.5 py-1 text-[11px] font-medium text-olive-600;
+  }
+}
+
+/* Autumn leaves (AutumnLeaves.tsx) - three nested elements, each with its OWN independent
+   animation period, composed together:
+     .leaf-drop  (outer, fixed)  - gravity: falls top to bottom, plus one slow overall
+                                   sideways push for the whole fall (the "wind" carrying it)
+     .leaf-sway  (middle)        - the flutter: oscillates left-right on a short loop of its
+                                   own (much shorter than the fall), so it swings several
+                                   times per fall instead of once
+     .leaf-spin  (inner)         - tumbles on yet another independent loop, combining a 2D
+                                   spin with a 3D rotateY so the leaf appears to turn edge-on
+                                   and catch the light as it falls
+   Because the three periods don't share a common multiple within one fall, the combination
+   never quite repeats the same way twice - that's what actually reads as "alive" instead of
+   a single mechanical keyframe, and it's also why the sway needs its own animation instead of
+   being one leg of the fall's keyframe: at fall-length timescales its motion was too small a
+   fraction of the total travel to actually notice. */
+@keyframes leaf-drop {
+  0% {
+    transform: translate3d(0, -10vh, 0);
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.5;
+  }
+  94% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate3d(var(--drift, 8vw), 110vh, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes leaf-sway {
+  0%,
+  100% {
+    transform: translateX(calc(var(--sway, 26px) * -1));
+  }
+  50% {
+    transform: translateX(var(--sway, 26px));
+  }
+}
+
+@keyframes leaf-spin {
+  0% {
+    transform: rotate(0deg) rotateY(0deg);
+  }
+  50% {
+    transform: rotate(calc(var(--rot, 320deg) * 0.5)) rotateY(180deg);
+  }
+  100% {
+    transform: rotate(var(--rot, 320deg)) rotateY(360deg);
+  }
+}
+
+.leaf-drop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  animation-name: leaf-drop;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.leaf-sway {
+  /* perspective belongs on the parent of the element doing the rotateY (.leaf-spin below),
+     not on that element itself, or it has no effect on its own 3D transform. */
+  perspective: 200px;
+  animation-name: leaf-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.leaf-spin {
+  display: block;
+  animation-name: leaf-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaf-drop {
+    display: none;
+  }
+}
